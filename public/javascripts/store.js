@@ -8,6 +8,8 @@
  * A production app would need to handle this very differently.
  */
 
+const DOMAIN = 'http://dev.biclicious.biz:8080'
+
 class Store {
   constructor() {
     this.lineItems = [];
@@ -40,7 +42,7 @@ class Store {
   // Retrieve the configuration from the API.
   async getConfig() {
     try {
-      const response = await fetch('/config');
+      const response = await fetch(DOMAIN + '/config');
       const config = await response.json();
       if (config.stripePublishableKey.includes('live')) {
         // Hide the demo notice if the publishable key is in live mode.
@@ -54,7 +56,7 @@ class Store {
 
   // Load the product details.
   async loadProducts() {
-    const productsResponse = await fetch('/products');
+    const productsResponse = await fetch(DOMAIN + '/products');
     const products = (await productsResponse.json()).data;
     products.forEach(product => (this.products[product.id] = product));
   }
@@ -62,7 +64,7 @@ class Store {
   // Create an order object to represent the line items.
   async createOrder(currency, items, email, shipping) {
     try {
-      const response = await fetch('/orders', {
+      const response = await fetch(DOMAIN + '/orders', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
@@ -89,7 +91,7 @@ class Store {
   // Pay the specified order by sending a payment source alongside it.
   async payOrder(order, source) {
     try {
-      const response = await fetch(`/orders/${order.id}/pay`, {
+      const response = await fetch(DOMAIN + `/orders/${order.id}/pay`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({source}),
@@ -108,7 +110,7 @@ class Store {
   // Fetch an order status from the API.
   async getOrderStatus(orderId) {
     try {
-      const response = await fetch(`/orders/${orderId}`);
+      const response = await fetch(DOMAIN + `/orders/${orderId}`);
       return await response.json();
     } catch (err) {
       return {error: err};
